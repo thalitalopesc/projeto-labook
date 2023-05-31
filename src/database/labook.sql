@@ -18,7 +18,7 @@ VALUES ("01", "Thalita Costa", "thalitacosta@email.com", "1234ABC", "Admin"),
 
 CREATE TABLE posts(
     id TEXT PRIMARY KEY UNIQUE NOT NULL,
-    creator_id TEXT NOT NULL,
+    creator_id TEXT,
     content TEXT NOT NULL,
     likes INTEGER,
     dislikes INTEGER,

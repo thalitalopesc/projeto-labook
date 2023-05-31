@@ -53,9 +53,10 @@ app.post("/users/signup", async (req: Request, res: Response)=>{
     }
 })
 
-// LOGIN
+// LOGIN - CARREGA SEM PARAR NO POSTMAN
 app.post("/users/login", async (req: Request, res: Response)=>{
     try {
+
         const email = req.body.email
         const password = req.body.password
 
@@ -82,21 +83,23 @@ app.post("/users/login", async (req: Request, res: Response)=>{
     }
 })
 
-// GET POSTS - OLHAR O RESULT
+// GET POSTS
 app.get("/posts", async (req: Request, res: Response)=>{
     try {
-        const result = await db("posts")
 
-        const userCreator = await db("users")
+        const result = await db("users")
         .select(
-            "users.id",
+            "users.id AS userID",
             "users.name",
             "posts.id",
-            "posts.creator_id",
-            "posts.content"
+            "posts.likes",
+            "posts.dislikes",
+            "posts.content",
+            "posts.created_at",
+            "posts.updated_at"
         ).innerJoin(
             "posts",
-            "users.id",
+            "userID",
             "=",
             "posts.creator_id"
         )
@@ -106,11 +109,7 @@ app.get("/posts", async (req: Request, res: Response)=>{
           throw new Error("Não existem posts cadastrados.");
         }
 
-        /* const mapResult = result.map((post) => {
-            post.creator = "ts"
-        }) */
-
-      res.status(200).send(userCreator)
+      res.status(200).send(result)
     } catch (error) {
         console.log(error)
 
@@ -132,6 +131,7 @@ app.post("/posts", async (req: Request, res: Response)=>{
     try {
 
         const content = req.body.content
+        const id = req.body.id
 
         if(!content){
             res.status(400)
@@ -139,6 +139,7 @@ app.post("/posts", async (req: Request, res: Response)=>{
         }
 
         const newPost = {
+            id: id,
             content: content
         }
 
@@ -167,7 +168,7 @@ app.put("/posts/:id", async (req: Request, res: Response) =>{
         const idToEdit = req.params.id
 
         const newContent = req.body.content
-       /*  const newUpdatedAt = datetime("now", "localtime") */
+        const newUpdatedAt = new Date().toISOString()
 
         if (newContent !== undefined) {
 
@@ -185,12 +186,12 @@ app.put("/posts/:id", async (req: Request, res: Response) =>{
 
             if (post) {
                 await db.update({content: newContent}).from("posts").where({id:idToEdit})
-                /* await db.update({updated_at: newUpdatedAt}).from("posts").where({id:idToEdit}) */
+                await db.update({updated_at: newUpdatedAt}).from("posts").where({id:idToEdit})
             } else {
                 res.status(404)
                 throw new Error("'id' não encontrada")
             }
-    
+            
             res.status(200).send({ message: "Post atualizado com sucesso" })
         }
     } catch (error) {
@@ -237,30 +238,28 @@ app.put("/posts/:id/like", async (req: Request, res: Response) =>{
     try {
 
         const idToLike = req.params.id
+
         const newLike = req.body.like
 
-        if (newLike != true || newLike != false) {
-
-            res.status(400)
-            throw new Error("Insira um valor que seja false para dislike ou true para like.")
-        }
+        const like = 1
+        const dislike = 0
         
-            const [ post ] = await db.select("*").from("likes_dislikes").where({post_id:idToLike})
+        const [ post ] = await db.select("*").from("likes_dislikes").where({post_id:idToLike})
 
             if (post) {
-
-                await db.update({like: newLike}).from("likes_dislikes").where({post_id:idToLike})
-
+                if(newLike === true) {
+                    await db.update({like: like}).from("likes_dislikes").where({post_id:idToLike})
+                    res.status(200).send({message: "Post curtido com sucesso"})
+                } else {
+                    await db.update({like: dislike}).from("likes_dislikes").where({post_id:idToLike})
+                    res.status(200).send({message: "Post descurtido com sucesso"})
+                }
+                
             } else {
                 res.status(404)
                 throw new Error("Post não encontrado")
             }
             
-            if(newLike === true) {
-                res.status(200).send({message: "Post curtido com sucesso"})
-            } else {
-                res.status(200).send({message: "Post descurtido com sucesso"})
-            }
     
         
     } catch (error) {
