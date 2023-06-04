@@ -1,67 +1,104 @@
 export class Posts {
     constructor(
-        private id: string,
-        private creator_id: string,
-        private content: string,
-        private likes: number,
-        private dislikes: number,
-        private created_at: string,
-        private updated_at: string
+      private id: string,
+      private content: string,
+      private createdAt: string,
+      private updatedAt: string,
+      private likes: number,
+      private dislikes: number,
+      private creatorId: string
     ) {}
-
+  
     public getId(): string {
-        return this.id
+      return this.id;
     }
-    
     public setId(value: string): void {
-        this.id = value
+      this.id = value;
     }
-
+  
     public getCreatorId(): string {
-        return this.creator_id
+      return this.creatorId;
     }
-
+  
     public setCreatorId(value: string): void {
-        this.creator_id = value
+      this.creatorId = value;
     }
-
-    public getContent(): string {
-        return this.content
-    }
-
-    public setContent(value: string): void {
-        this.content = value
-    }
-
-    public getLikes(): number {
-        return this.likes
-    }
-
-    public setLikes(value: number): void {
-        this.likes = value
-    }
-
-    public getDislikes(): number {
-        return this.dislikes
-    }
-
-    public setDislikes(value: number): void {
-        this.dislikes = value
-    }
-
-    public getCreatedAt(): string {
-        return this.created_at
-    }
-
-    public setCreatedAt(value: string): void {
-        this.created_at = value
-    }
-
+  
     public getUpdatedAt(): string {
-        return this.updated_at
+      return this.updatedAt;
     }
+    public setUpdatedAt(value: string) {
+      this.updatedAt = value;
+    }
+    public getDislikes(): number {
+      return this.dislikes;
+    }
+    public setDislikes(value: number) {
+      this.dislikes = value;
+    }
+    public getLikes(): number {
+      return this.likes;
+    }
+    public setLikes(value: number) {
+      this.likes = value;
+    }
+  
+    public getContent(): string {
+      return this.content;
+    }
+    public setContent(value: string) {
+      this.content = value;
+    }
+  
+    public getCreatedAt(): string {
+      return this.createdAt;
+    }
+  
+    public setCreatedAt(value: string): void {
+      this.createdAt = value;
+    }
+  
+    public toDBModel(): PostDB {
+      return {
+       id :this.id,
+       content  : this.content,
+       created_at: this.createdAt,
+       updated_at : this.updatedAt,
+       likes: this.likes,
+       dislikes: this.dislikes,
+       creator_id: this.creatorId,
+      }
+    }
+    public toBusinessModel():PostModel{
+    return{
+      id: this.id,
+      content: this.content,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      likes: this.likes,
+      dislikes: this.dislikes,
+      creatorId : this.creatorId
+    }
+    }
+  }
 
-    public setUpdateddAt(value: string): void {
-        this.updated_at = value
-    }
-}
+  export interface PostDB {
+    id: string,
+    content: string,
+    created_at: string
+    updated_at : string,
+    likes: number,
+    dislikes: number,
+    creator_id : string
+  
+  }
+  
+  export interface PostModel {
+    id: string,
+    content: string,
+    createdAt: string,
+    updatedAt:string
+    likes: number,
+    dislikes: number,
+    creatorId : string
+  }
